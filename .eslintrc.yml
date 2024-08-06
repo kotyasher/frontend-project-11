@@ -1,11 +1,19 @@
+---
+root: true
+
+plugins:
+  - prettier
+
 env:
-  browser: true
-  es2021: true
   node: true
-extends: airbnb-base
-parserOptions:
-  ecmaVersion: latest
-  sourceType: module
+  browser: true
+
+extends:
+  - 'airbnb-base'
+  - 'plugin:prettier/recommended'
+
 rules:
+  no-console: 0
   import/extensions: 0
-  no-param-reassign: 0
+  prettier/prettier: error
+  no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]
