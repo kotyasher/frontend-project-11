@@ -1,4 +1,5 @@
-import "./styles.scss";
 import "bootstrap";
+import "./styles.scss";
+import app from "./validation.js";
 
-console.log("Hello World!");
+app();
