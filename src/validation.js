@@ -4,13 +4,13 @@ import render from "./view.js";
 
 // /home/frontend-project-11/src/js
 
-  const schema = yup.string().lowercase().trim().url();
+const schema = yup.string().lowercase().trim().url();
 
-  const validate = (url) =>
-    schema
-      .validate(url)
-      .then(() => "")
-      .catch((e) => e.message);
+const validate = (url) =>
+  schema
+    .validate(url)
+    .then(() => "")
+    .catch((e) => e.message);
 
 export default () => {
   const elements = {
