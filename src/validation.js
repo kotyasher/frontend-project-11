@@ -1,16 +1,25 @@
 import * as yup from "yup";
 import onChange from "on-change";
+import i18next from "i18next";
 import render from "./view.js";
+import resources from "./locales/index.js";
 
-// /home/frontend-project-11/src/js
+// /home/frontend-project-11/src
+const i18nInstance = i18next.createInstance();
+i18nInstance.init({
+  lng: "ru",
+  debug: false,
+  resources,
+});
 
-const schema = yup.string().lowercase().trim().url();
-
-const validate = (url) =>
-  schema
-    .validate(url)
-    .then(() => "")
-    .catch((e) => e.message);
+yup.setLocale({
+  mixed: {
+    notOneOf: () => "errorsTexts.notUniq",
+  },
+  string: {
+    url: () => "errorsTexts.invalidUrl",
+  },
+});
 
 export default () => {
   const elements = {
@@ -27,24 +36,27 @@ export default () => {
 
   const state = onChange(initialState, render(initialState, elements));
 
+  const validate = (url) => {
+    const schema = yup.string().lowercase().trim().url().notOneOf(state.list);
+
+    return schema
+      .validate(url)
+      .then(() => "successText")
+      .catch((e) => e.message);
+  };
+
   elements.form.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const url = formData.get("url");
-    validate(url).then((err) => {
-      const isUniq = state.list.includes(url);
-
-      if (err === "" && !isUniq) {
+    const url = formData.get("url").trim();
+    validate(url).then((feedbackPath) => {
+      state.feedbackText = i18nInstance.t(feedbackPath);
+      if (feedbackPath === "successText") {
         state.urlState = "valid";
-        state.feedbackText = "RSS успешно загружен";
         state.list.push(url);
-      } else if (err === "" && isUniq) {
-        state.urlState = "invalid";
-        state.feedbackText = "RSS уже существует";
       } else {
         state.urlState = "invalid";
-        state.feedbackText = "Ссылка должна быть валидным URL";
       }
     });
   });
