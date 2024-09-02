@@ -2,7 +2,7 @@
 import axios from "axios";
 import i18next from "i18next";
 import onChange from "on-change";
-import { string } from "yup";
+import { string, setLocale } from "yup";
 import { uniqueId, differenceWith } from "lodash";
 
 import render from "./view.js";
@@ -91,55 +91,69 @@ export default () => {
 
   const local = i18next.createInstance();
 
-  local.init({
-    lng: "ru",
-    debug: false,
-    resources,
-  });
-
-  const state = onChange(initialState, () => render(state, elements, local));
-
-  elements.form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const currentURL = new FormData(event.target).get("url");
-    const previousURLs = state.feeds.map(({ url }) => url);
-
-    validate(currentURL, previousURLs)
-      .then(() => {
-        state.form = { ...state.form, valid: true, error: null };
-        state.loadingProcess.status = "loading";
-
-        return axios.get(
-          `https://allorigins.hexlet.app/get?disableCache=true&url=${currentURL}`,
-        );
-      })
-      .then((response) => {
-        const { feed, posts } = parse(response);
-        const postsList = posts.map((post) => ({
-          ...post,
-          id: uniqueId(),
-          feedId: feed.id,
-        }));
-
-        state.feeds.unshift(feed);
-        state.posts.unshift(...postsList);
-        state.loadingProcess.error = null;
-        state.loadingProcess.status = "success";
-      })
-      .catch((error) => {
-        errorState(error, state);
+  local
+    .init({
+      lng: "ru",
+      debug: false,
+      resources,
+    })
+    .then(() => {
+      setLocale({
+        string: {
+          url: "notURL",
+        },
+        mixed: {
+          required: "required",
+          notOneOf: "exists",
+        },
       });
-  });
 
-  elements.rssPosts.addEventListener("click", ({ target }) => {
-    if (!("id" in target.dataset)) {
-      return;
-    }
+      const state = onChange(initialState, () =>
+        render(state, elements, local),
+      );
 
-    const { id } = target.dataset;
-    state.modal.postId = id;
-    state.ui.checkedPosts.add(id);
-  });
-  setTimeout(() => updateFeeds(state), 5000);
+      elements.form.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const currentURL = new FormData(event.target).get("url");
+        const previousURLs = state.feeds.map(({ url }) => url);
+
+        validate(currentURL, previousURLs)
+          .then(() => {
+            state.form = { ...state.form, valid: true, error: null };
+            state.loadingProcess.status = "loading";
+
+            return axios.get(
+              `https://allorigins.hexlet.app/get?disableCache=true&url=${currentURL}`,
+            );
+          })
+          .then((response) => {
+            const { feed, posts } = parse(response);
+            const postsList = posts.map((post) => ({
+              ...post,
+              id: uniqueId(),
+              feedId: feed.id,
+            }));
+
+            state.feeds.unshift(feed);
+            state.posts.unshift(...postsList);
+            state.loadingProcess.error = null;
+            state.loadingProcess.status = "success";
+          })
+          .catch((error) => {
+            errorState(error, state);
+          });
+      });
+
+      elements.rssPosts.addEventListener("click", ({ target }) => {
+        if (!("id" in target.dataset)) {
+          return;
+        }
+
+        const { id } = target.dataset;
+        state.modal.postId = id;
+        state.ui.checkedPosts.add(id);
+      });
+      setTimeout(() => updateFeeds(state), 5000);
+    });
 };
