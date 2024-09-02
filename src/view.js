@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign  */
+
 const createDOMElement = (title, list) => {
   const div = document.createElement("div");
   const h2 = document.createElement("h2");
@@ -40,21 +41,20 @@ const handleProcessState = (elements, state, i18next) => {
       elements.input.value = "";
       elements.feedback.textContent = i18next.t("loading.success");
 
-      elements.input.removeAttribute("readonly");
-      elements.feedback.classList.remove("text-danger");
-      elements.feedback.classList.add("text-success");
-      elements.form.reset();
       elements.input.focus();
+      elements.input.removeAttribute("readonly");
+      elements.feedback.classList.add("text-success");
 
       break;
 
     case "loading":
       elements.submitButton.disabled = true;
-      elements.feedback.textContent = "";
+      elements.feedback.innerHTML = "";
 
       elements.input.setAttribute("readonly", true);
       elements.feedback.classList.remove("text-success");
       elements.feedback.classList.remove("text-danger");
+
       break;
 
     case "failed":
@@ -65,9 +65,8 @@ const handleProcessState = (elements, state, i18next) => {
       ]);
 
       elements.input.removeAttribute("readonly");
-      elements.feedback.classList.remove("text-success");
       elements.feedback.classList.add("text-danger");
-      elements.input.focus();
+
       break;
 
     default:
@@ -137,6 +136,7 @@ const renderPosts = (elements, state, i18next) => {
 
     return li;
   });
+
   const div = createDOMElement(i18next.t("posts"), list);
 
   elements.rssPosts.innerHTML = "";

@@ -1,9 +1,10 @@
 /* eslint-disable no-param-reassign  */
+
 import axios from "axios";
 import i18next from "i18next";
 import onChange from "on-change";
 import { string, setLocale } from "yup";
-import { uniqueId, differenceWith } from "lodash";
+import { differenceWith, uniqueId } from "lodash";
 
 import render from "./view.js";
 import parse from "./parser.js";
@@ -43,18 +44,25 @@ const errorState = (error, state) => {
   switch (error.name) {
     case "ValidationError":
       state.form = { ...state.form, valid: false, error: error.message };
+
       break;
+
     case "parserError":
       state.loadingProcess.error = "noRSS";
       state.loadingProcess.status = "failed";
+
       break;
+
     case "AxiosError":
-      state.loadingProcess.error = "errNet";
+      state.loadingProcess.error = "network";
       state.loadingProcess.status = "failed";
+
       break;
+
     default:
       state.loadingProcess.error = "unknown";
       state.loadingProcess.status = "failed";
+
       break;
   }
 };
@@ -64,7 +72,7 @@ export default () => {
     feeds: [],
     posts: [],
     loadingProcess: {
-      status: "pending",
+      status: "idle",
       error: null,
     },
     form: {
@@ -75,17 +83,17 @@ export default () => {
       postId: null,
     },
     ui: {
-      checkedPosts: new Set(),
+      seenPosts: new Set(),
     },
   };
 
   const elements = {
     form: document.querySelector(".rss-form"),
-    input: document.querySelector("url-input"),
     feedback: document.querySelector(".feedback"),
+    input: document.getElementById("url-input"),
     submitButton: document.querySelector('button[type="submit"]'),
-    rssPosts: document.querySelector(".posts"),
     rssFeeds: document.querySelector(".feeds"),
+    rssPosts: document.querySelector(".posts"),
     modal: document.querySelector("#modal"),
   };
 
@@ -108,8 +116,9 @@ export default () => {
         },
       });
 
-      const state = onChange(initialState, () =>
-        render(state, elements, local),
+      const state = onChange(
+        initialState,
+        render(elements, initialState, local),
       );
 
       elements.form.addEventListener("submit", (event) => {
@@ -158,9 +167,12 @@ export default () => {
         }
 
         const { id } = target.dataset;
+
         state.modal.postId = id;
-        state.ui.checkedPosts.add(id);
+
+        state.ui.seenPosts.add(id);
       });
+
       setTimeout(() => updateFeeds(state), 5000);
     });
 };
