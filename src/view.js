@@ -40,10 +40,12 @@ const handleProcessState = (elements, state, i18next) => {
       elements.input.value = "";
       elements.feedback.textContent = i18next.t("loading.success");
 
-      elements.input.focus();
       elements.input.removeAttribute("readonly");
       elements.feedback.classList.remove("text-danger");
       elements.feedback.classList.add("text-success");
+      elements.form.reset();
+      elements.input.focus();
+
       break;
 
     case "loading":
@@ -65,6 +67,7 @@ const handleProcessState = (elements, state, i18next) => {
       elements.input.removeAttribute("readonly");
       elements.feedback.classList.remove("text-success");
       elements.feedback.classList.add("text-danger");
+      elements.input.focus();
       break;
 
     default:
