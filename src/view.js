@@ -32,6 +32,7 @@ const renderFormState = (elements, state, i18next) => {
     elements.feedback.classList.add("text-danger");
   }
 };
+
 const handleProcessState = (elements, state, i18next) => {
   switch (state.loadingProcess.status) {
     case "success":
@@ -41,18 +42,17 @@ const handleProcessState = (elements, state, i18next) => {
 
       elements.input.focus();
       elements.input.removeAttribute("readonly");
+      elements.feedback.classList.remove("text-danger");
       elements.feedback.classList.add("text-success");
-
       break;
 
     case "loading":
       elements.submitButton.disabled = true;
-      elements.feedback.innerHTML = "";
+      elements.feedback.textContent = "";
 
       elements.input.setAttribute("readonly", true);
       elements.feedback.classList.remove("text-success");
       elements.feedback.classList.remove("text-danger");
-
       break;
 
     case "failed":
@@ -63,8 +63,8 @@ const handleProcessState = (elements, state, i18next) => {
       ]);
 
       elements.input.removeAttribute("readonly");
+      elements.feedback.classList.remove("text-success");
       elements.feedback.classList.add("text-danger");
-
       break;
 
     default:
