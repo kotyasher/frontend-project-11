@@ -38,23 +38,21 @@ const handleProcessState = (elements, state, i18next) => {
   switch (state.loadingProcess.status) {
     case "success":
       elements.submitButton.disabled = false;
-      elements.input.value = "";
       elements.feedback.textContent = i18next.t("loading.success");
-
-      elements.input.focus();
-      elements.input.removeAttribute("readonly");
+      elements.feedback.classList.remove("text-danger");
       elements.feedback.classList.add("text-success");
 
+      elements.input.removeAttribute("readonly");
+      elements.form.reset();
+      elements.input.focus();
       break;
 
     case "loading":
       elements.submitButton.disabled = true;
-      elements.feedback.innerHTML = "";
+      elements.feedback.textContent = "";
 
       elements.input.setAttribute("readonly", true);
-      elements.feedback.classList.remove("text-success");
-      elements.feedback.classList.remove("text-danger");
-
+      elements.feedback.classList.remove("text-success", "text-danger");
       break;
 
     case "failed":
@@ -65,8 +63,9 @@ const handleProcessState = (elements, state, i18next) => {
       ]);
 
       elements.input.removeAttribute("readonly");
+      elements.feedback.classList.remove("text-success");
       elements.feedback.classList.add("text-danger");
-
+      elements.input.focus();
       break;
 
     default:
