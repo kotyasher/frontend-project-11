@@ -128,7 +128,13 @@ export default () => {
             );
           })
           .then((response) => {
-            const { feed, posts } = parse(response);
+            const { title, description, posts } = parse(response.data.contents);
+            const feed = {
+              id: uniqueId(),
+              url: currentURL,
+              title,
+              description,
+            };
             const postsList = posts.map((post) => ({
               ...post,
               id: uniqueId(),
@@ -137,6 +143,7 @@ export default () => {
 
             state.feeds.unshift(feed);
             state.posts.unshift(...postsList);
+
             state.loadingProcess.error = null;
             state.loadingProcess.status = "success";
           })
