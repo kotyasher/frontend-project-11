@@ -5,6 +5,6 @@
 
 **RSS Agrigator**
 
-######[Exapmle on Vercel](https://kotyasher-rss-reader.vercel.app)
+[Exapmle on Vercel](https://kotyasher-rss-reader.vercel.app)
 
 This is the web application for aggregating RSS feeds, with which it is convenient to read various sources, such as blogs.
