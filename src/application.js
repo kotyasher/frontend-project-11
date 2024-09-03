@@ -54,7 +54,7 @@ const errorState = (error, state) => {
       break;
 
     case "AxiosError":
-      state.loadingProcess.error = "network";
+      state.loadingProcess.error = "errNet";
       state.loadingProcess.status = "failed";
 
       break;
