@@ -1,14 +1,14 @@
 /* eslint-disable no-param-reassign  */
 
-import axios from "axios";
-import i18next from "i18next";
-import onChange from "on-change";
-import { string, setLocale } from "yup";
-import { differenceWith, uniqueId } from "lodash";
+import axios from 'axios';
+import i18next from 'i18next';
+import onChange from 'on-change';
+import { string, setLocale } from 'yup';
+import { differenceWith, uniqueId } from 'lodash';
 
-import render from "./view.js";
-import parse from "./parser.js";
-import resources from "./locales/index.js";
+import render from './view.js';
+import parse from './parser.js';
+import resources from './locales/index.js';
 
 const validate = (currentURL, previousURLs) => {
   const schema = string().url().required().notOneOf(previousURLs);
@@ -16,24 +16,22 @@ const validate = (currentURL, previousURLs) => {
 };
 
 const updateFeeds = (state) => {
-  const promise = state.feeds.map(({ url, id }) =>
-    axios
-      .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
-      .then((response) => {
-        const currentPosts = state.posts.filter(({ feedId }) => feedId === id);
-        const loadedPosts = parse(response.data.contents).posts.map((post) => ({
-          ...post,
-          feedId: id,
-        }));
-        const newPosts = differenceWith(
-          loadedPosts,
-          currentPosts,
-          (loadedPost, currentPost) => loadedPost.title === currentPost.title,
-        ).map((post) => ({ ...post, id: uniqueId() }));
+  const promise = state.feeds.map(({ url, id }) => axios
+    .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
+    .then((response) => {
+      const currentPosts = state.posts.filter(({ feedId }) => feedId === id);
+      const loadedPosts = parse(response.data.contents).posts.map((post) => ({
+        ...post,
+        feedId: id,
+      }));
+      const newPosts = differenceWith(
+        loadedPosts,
+        currentPosts,
+        (loadedPost, currentPost) => loadedPost.title === currentPost.title,
+      ).map((post) => ({ ...post, id: uniqueId() }));
 
-        state.posts.unshift(...newPosts);
-      }),
-  );
+      state.posts.unshift(...newPosts);
+    }));
 
   Promise.all(promise).finally(() => {
     setTimeout(() => updateFeeds(state), 5000);
@@ -42,26 +40,26 @@ const updateFeeds = (state) => {
 
 const errorState = (error, state) => {
   switch (error.name) {
-    case "ValidationError":
+    case 'ValidationError':
       state.form = { ...state.form, valid: false, error: error.message };
 
       break;
 
-    case "parserError":
-      state.loadingProcess.error = "noRSS";
-      state.loadingProcess.status = "failed";
+    case 'parserError':
+      state.loadingProcess.error = 'noRSS';
+      state.loadingProcess.status = 'failed';
 
       break;
 
-    case "AxiosError":
-      state.loadingProcess.error = "errNet";
-      state.loadingProcess.status = "failed";
+    case 'AxiosError':
+      state.loadingProcess.error = 'errNet';
+      state.loadingProcess.status = 'failed';
 
       break;
 
     default:
-      state.loadingProcess.error = "unknown";
-      state.loadingProcess.status = "failed";
+      state.loadingProcess.error = 'unknown';
+      state.loadingProcess.status = 'failed';
 
       break;
   }
@@ -72,7 +70,7 @@ export default () => {
     feeds: [],
     posts: [],
     loadingProcess: {
-      status: "idle",
+      status: 'idle',
       error: null,
     },
     form: {
@@ -88,31 +86,31 @@ export default () => {
   };
 
   const elements = {
-    form: document.querySelector(".rss-form"),
-    feedback: document.querySelector(".feedback"),
-    input: document.getElementById("url-input"),
+    form: document.querySelector('.rss-form'),
+    feedback: document.querySelector('.feedback'),
+    input: document.getElementById('url-input'),
     submitButton: document.querySelector('button[type="submit"]'),
-    rssFeeds: document.querySelector(".feeds"),
-    rssPosts: document.querySelector(".posts"),
-    modal: document.querySelector("#modal"),
+    rssFeeds: document.querySelector('.feeds'),
+    rssPosts: document.querySelector('.posts'),
+    modal: document.querySelector('#modal'),
   };
 
   const local = i18next.createInstance();
 
   local
     .init({
-      lng: "ru",
+      lng: 'ru',
       debug: false,
       resources,
     })
     .then(() => {
       setLocale({
         string: {
-          url: "notURL",
+          url: 'notURL',
         },
         mixed: {
-          required: "required",
-          notOneOf: "exists",
+          required: 'required',
+          notOneOf: 'exists',
         },
       });
 
@@ -121,16 +119,16 @@ export default () => {
         render(elements, initialState, local),
       );
 
-      elements.form.addEventListener("submit", (event) => {
+      elements.form.addEventListener('submit', (event) => {
         event.preventDefault();
 
-        const currentURL = new FormData(event.target).get("url");
+        const currentURL = new FormData(event.target).get('url');
         const previousURLs = state.feeds.map(({ url }) => url);
 
         validate(currentURL, previousURLs)
           .then(() => {
             state.form = { ...state.form, valid: true, error: null };
-            state.loadingProcess.status = "loading";
+            state.loadingProcess.status = 'loading';
 
             return axios.get(
               `https://allorigins.hexlet.app/get?disableCache=true&url=${currentURL}`,
@@ -154,15 +152,15 @@ export default () => {
             state.posts.unshift(...postsList);
 
             state.loadingProcess.error = null;
-            state.loadingProcess.status = "success";
+            state.loadingProcess.status = 'success';
           })
           .catch((error) => {
             errorState(error, state);
           });
       });
 
-      elements.rssPosts.addEventListener("click", ({ target }) => {
-        if (!("id" in target.dataset)) {
+      elements.rssPosts.addEventListener('click', ({ target }) => {
+        if (!('id' in target.dataset)) {
           return;
         }
 
