@@ -1,25 +1,23 @@
 /* eslint-disable no-param-reassign  */
-
 const createDOMElement = (title, list) => {
   const div = document.createElement('div');
+  const cardBody = document.createElement('div');
   const h2 = document.createElement('h2');
   const ul = document.createElement('ul');
 
-  div.innerHTML = "<div class='card-body'></div>";
-  h2.textContent = title;
-
   div.classList.add('card', 'border-0');
+  cardBody.classList.add('card-body');
   h2.classList.add('card-title', 'h4');
   ul.classList.add('list-group', 'border-0', 'rounded-0');
 
-  div.querySelector('.card-body').appendChild(h2);
-
+  h2.textContent = title;
+  cardBody.appendChild(h2);
+  div.appendChild(cardBody);
   ul.append(...list);
   div.appendChild(ul);
 
   return div;
 };
-
 const renderFormState = (elements, state, i18next) => {
   if (state.valid) {
     elements.input.classList.remove('is-invalid');
